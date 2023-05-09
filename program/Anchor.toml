@@ -1,18 +1,21 @@
 [features]
 seeds = false
 [programs.localnet]
-tmp = "CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T"
+tmp = "BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse"
 [programs.devnet]
-tmp = "CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T"
+tmp = "BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse"
 [programs.mainnet]
-tmp = "CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T"
+tmp = "BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse"
+# orig - CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T
+# new - BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
 cluster = "localnet"
-wallet = "/Users/edgar/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json"
+# wallet = "../mainnet-fork/localnet_owner.key"
+wallet = "~/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

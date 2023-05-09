@@ -61,9 +61,7 @@ fn main() {
 
     let owner_kp_path = match cluster {
         Cluster::Localnet => "../../mainnet_fork/localnet_owner.key",
-        Cluster::Mainnet => {
-            "/Users/edgar/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json"
-        }
+        Cluster::Mainnet => "~/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json",
         _ => panic!("shouldnt get here"),
     };
 
@@ -94,19 +92,19 @@ fn main() {
     let mut pool_dirs = vec![];
 
     let orca_dir = PoolDir {
-        tipe: PoolType::OrcaPoolType,
+        pool_type: PoolType::OrcaPoolType,
         dir_path: "../pools/orca".to_string(),
     };
     pool_dirs.push(orca_dir);
 
     let mercurial_dir = PoolDir {
-        tipe: PoolType::MercurialPoolType,
+        pool_type: PoolType::MercurialPoolType,
         dir_path: "../pools/mercurial".to_string(),
     };
     pool_dirs.push(mercurial_dir);
 
     let saber_dir = PoolDir {
-        tipe: PoolType::SaberPoolType,
+        pool_type: PoolType::SaberPoolType,
         dir_path: "../pools/saber/".to_string(),
     };
     pool_dirs.push(saber_dir);
@@ -129,7 +127,7 @@ fn main() {
 
         for pool_path in pool_paths {
             let json_str = std::fs::read_to_string(&pool_path).unwrap();
-            let pool = pool_factory(&pool_dir.tipe, &json_str);
+            let pool = pool_factory(&pool_dir.pool_type, &json_str);
 
             let pool_mints = pool.get_mints();
             if pool_mints.len() != 2 {
