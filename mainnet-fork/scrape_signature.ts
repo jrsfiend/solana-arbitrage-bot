@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import * as fs from "fs";
 
 async function main() {
-    let connection = new web3.Connection("https://api.mainnet-beta.solana.com")
+    let connection = new web3.Connection("https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9")
 
     // tx to scrape into local 
     

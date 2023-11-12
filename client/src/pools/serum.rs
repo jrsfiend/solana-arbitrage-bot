@@ -283,7 +283,7 @@ impl PoolOperations for SerumPool {
         let open_orders =
             Pubkey::from_str(oos.get(&self.own_address.0.to_string()).unwrap()).unwrap();
 
-        let (swap_state, _) = Pubkey::find_program_address(&[b"swap_state"], &program.id());
+        let swap_state = Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap();
 
         let base_ata = derive_token_address(owner, &self.base_mint);
         let quote_ata = derive_token_address(owner, &self.quote_mint);

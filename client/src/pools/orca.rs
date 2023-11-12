@@ -2,11 +2,20 @@ use crate::pool::PoolOperations;
 use crate::serialize::pool::JSONFeeStructure;
 use crate::serialize::token::{unpack_token_account, Token, WrappedPubkey};
 use serde;
+use anchor_client::Client;
+use solana_sdk::commitment_config::CommitmentConfig;
+use solana_sdk::signature::read_keypair_file;
+use solana_sdk::transaction::Transaction;
+use std::rc::Rc;
+use anchor_client::solana_client::rpc_client::RpcClient;
+use anchor_client::solana_client::rpc_config::RpcSendTransactionConfig;
+use solana_sdk::signature::Signer;
+
 use serde::{Deserialize, Serialize};
 use solana_sdk::account::Account;
 use std::collections::HashMap;
 use std::fmt::Debug;
-
+use std::str::FromStr;
 use anchor_client::solana_sdk::pubkey::Pubkey;
 use anchor_client::Cluster;
 use anchor_client::Program;
@@ -49,10 +58,71 @@ impl PoolOperations for OrcaPool {
         mint_in: &Pubkey,
         mint_out: &Pubkey,
     ) -> Vec<Instruction> {
-        let (swap_state, _) = Pubkey::find_program_address(&[b"swap_state"], &program.id());
+        let swap_state = Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap();
         let user_src = derive_token_address(owner, mint_in);
         let user_dst = derive_token_address(owner, mint_out);
 
+        let cluster = Cluster::Mainnet;
+
+
+        let owner_kp_path = match cluster {
+            Cluster::Localnet => "../../mainnet_fork/localnet_owner.key",
+            Cluster::Mainnet => {
+                "/Users/stevengavacs/.config/solana/id.json"
+            }
+            _ => panic!("shouldnt get here"),
+        };
+
+        // ** setup RPC connection
+        let connection_url = match cluster {
+            Cluster::Mainnet => {
+                "https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9"
+            }
+            _ => cluster.url(),
+        };
+
+        let send_tx_connection =
+            RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
+    
+        // setup anchor things
+        let owner2 = read_keypair_file(owner_kp_path.clone()).unwrap();
+        let rc_owner = Rc::new(read_keypair_file(owner_kp_path.clone()).unwrap());
+        let provider = Client::new_with_options(
+            cluster.clone(),
+            rc_owner.clone(),
+            CommitmentConfig::recent(),
+        );
+        let program = provider.program(*ARB_PROGRAM_ID);
+        let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::recent());
+        let user_src_account_info = connection.get_account(&user_dst);
+        if user_src_account_info.is_err() {
+            
+        let instructions = program
+            .request()
+            .instruction(
+                spl_associated_token_account::create_associated_token_account(
+                    &owner,
+                    &owner,
+                    mint_out,
+                ),
+            )
+            .instructions().unwrap();
+let recent_blockhash = connection.get_latest_blockhash().unwrap();
+        let mut tx = Transaction::new_signed_with_payer(
+            &instructions,
+            Some(&owner),
+            &[&owner2],
+            recent_blockhash
+        );
+        send_tx_connection.send_and_confirm_transaction_with_spinner_and_config(
+            &tx,
+            CommitmentConfig::recent(),
+            RpcSendTransactionConfig {
+                skip_preflight: true,
+                ..RpcSendTransactionConfig::default()
+            },
+        ).unwrap();
+    }
         let (authority_pda, _) =
             Pubkey::find_program_address(&[&self.address.to_bytes()], &ORCA_PROGRAM_ID);
 
@@ -88,6 +158,11 @@ impl PoolOperations for OrcaPool {
         mint_in: &Pubkey,
         mint_out: &Pubkey,
     ) -> u128 {
+        if !self.pool_amounts.contains_key(&mint_in.to_string())
+            || !self.pool_amounts.contains_key(&mint_out.to_string())
+        {
+            return 0;
+        }
         let pool_src_amount = self.pool_amounts.get(&mint_in.to_string()).unwrap();
         let pool_dst_amount = self.pool_amounts.get(&mint_out.to_string()).unwrap();
 

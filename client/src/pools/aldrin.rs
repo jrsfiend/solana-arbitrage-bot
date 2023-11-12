@@ -57,7 +57,7 @@ impl PoolOperations for AldrinPool {
         _mint_in: &Pubkey,
         mint_out: &Pubkey,
     ) -> Vec<Instruction> {
-        let (state_pda, _) = Pubkey::find_program_address(&[b"swap_state"], &program.id());
+        let state_pda = ((Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap()));
 
         let base_token_mint = &self.token_ids[0];
         let quote_token_mint = &self.token_ids[1];

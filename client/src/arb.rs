@@ -12,7 +12,7 @@ use solana_sdk::transaction::Transaction;
 
 use std::borrow::Borrow;
 use std::rc::Rc;
-
+use std::str::FromStr;
 use std::vec;
 
 use log::info;
@@ -85,12 +85,12 @@ impl Arbitrager {
                 new_pool_path.push(pool.clone()); // clone the pointer
 
                 if dst_mint_idx == start_mint_idx {
-                    // info!("{:?} -> {:?} (-{:?})", init_balance, new_balance, init_balance - new_balance);
+                    // println!("{:?} -> {:?} (-{:?})", init_balance, new_balance, init_balance - new_balance);
 
                     // if new_balance > init_balance - 1086310399 {
-                    if new_balance > init_balance {
+                    if new_balance as f64 > init_balance as f64 * 1.001 {
                         // ... profitable arb!
-                        info!("found arbitrage: {:?} -> {:?}", init_balance, new_balance);
+                        println!("found arbitrage: {:?} -> {:?}", init_balance, new_balance);
 
                         // check if arb was sent with a larger size
                         // key = {mint_path}{pool_names}
@@ -100,7 +100,7 @@ impl Arbitrager {
                             new_pool_path.iter().map(|p| p.0.get_name()).collect();
                         let arb_key = format!("{}{}", mint_keys.join(""), pool_keys.join(""));
                         if sent_arbs.contains(&arb_key) {
-                            info!("arb already sent...");
+                            println!("arb already sent...");
                             continue; // dont re-send an already sent arb -- bad for network
                         } else {
                             sent_arbs.insert(arb_key);
@@ -136,9 +136,8 @@ impl Arbitrager {
     ) -> Vec<Instruction> {
         // gather swap ixs
         let mut ixs = vec![];
-        let (swap_state_pda, _) =
-            Pubkey::find_program_address(&[b"swap_state"], &self.program.id());
-
+        let swap_state_pda =
+            (Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap());
         let src_mint = self.token_mints[mint_idxs[0]];
         let src_ata = derive_token_address(&self.owner.pubkey(), &src_mint);
 
@@ -147,7 +146,6 @@ impl Arbitrager {
             .program
             .request()
             .accounts(tmp_accounts::TokenAndSwapState {
-                src: src_ata,
                 swap_state: swap_state_pda,
             })
             .args(tmp_ix::StartSwap {
@@ -169,20 +167,20 @@ impl Arbitrager {
         }
 
         // PROFIT OR REVERT instruction
-        let ix = self
-            .program
-            .request()
-            .accounts(tmp_accounts::TokenAndSwapState {
-                src: src_ata,
-                swap_state: swap_state_pda,
-            })
-            .args(tmp_ix::ProfitOrRevert {})
-            .instructions()
-            .unwrap();
-        ixs.push(ix);
-
+        let ix = spl_token::instruction::transfer(
+            &spl_token::id(),
+            &src_ata,
+            &src_ata,
+            &self.owner.pubkey(),
+            &[],
+            swap_start_amount as u64,
+        ).unwrap();
+        
         // flatten to Vec<Instructions>
-        ixs.concat()
+        let mut iis = ixs.concat();
+        iis.push(ix);
+        iis 
+
     }
 
     fn send_ixs(&self, ixs: Vec<Instruction>) {

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::Accounts;
 use anchor_spl::token::TokenAccount;
 
-declare_id!("BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse");
+declare_id!("CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T");
 
 use error::ErrorCode;
 use state::SwapState;
@@ -27,7 +27,6 @@ pub mod tmp {
 
     pub fn start_swap(ctx: Context<TokenAndSwapState>, swap_input: u64) -> Result<()> {
         let swap_state = &mut ctx.accounts.swap_state;
-        swap_state.start_balance = ctx.accounts.src.amount; // !
         swap_state.swap_input = swap_input; // !
         swap_state.is_valid = true;
         Ok(())
@@ -38,17 +37,7 @@ pub mod tmp {
         swap_state.is_valid = false; // record end of swap
 
         let init_balance = swap_state.start_balance;
-        let final_balance = ctx.accounts.src.amount;
 
-        msg!(
-            "old = {:?}; new = {:?}; diff = {:?}",
-            init_balance,
-            final_balance,
-            final_balance - init_balance
-        );
-
-        // ensure profit or revert
-        require!(final_balance > init_balance, ErrorCode::NoProfit);
 
         Ok(())
     }
@@ -184,6 +173,7 @@ pub fn prepare_swap(swap_state: &Account<SwapState>) -> Result<u64> {
 pub struct InitSwapState<'info> {
     #[account(
         init, 
+        space=17+8,
         payer=payer,
         seeds=[b"swap_state"], 
         bump, 
@@ -196,7 +186,6 @@ pub struct InitSwapState<'info> {
 
 #[derive(Accounts)]
 pub struct TokenAndSwapState<'info> {
-    src: Account<'info, TokenAccount>,
     #[account(mut, seeds=[b"swap_state"], bump)]
     pub swap_state: Account<'info, SwapState>,
 }

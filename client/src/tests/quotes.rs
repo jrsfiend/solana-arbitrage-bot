@@ -4,7 +4,7 @@ use anchor_client::solana_sdk::pubkey::Pubkey;
 use anchor_client::solana_sdk::signature::read_keypair_file;
 use anchor_client::solana_sdk::signature::{Keypair, Signer};
 use anchor_client::{Client, Cluster, Program};
-
+use std::str::FromStr;
 use solana_sdk::transaction::Transaction;
 use spl_token::instruction::mint_to;
 
@@ -56,7 +56,7 @@ fn orca() {
 fn test_all_pool_quotes(pool_dir: String, pool_type: PoolType) {
     // setup stuff
     let cluster = Cluster::Localnet;
-    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
+    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
 
     // let owner_kp_path = "/Users/vbetsun/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json";
     let owner_kp_path = "../mainnet-fork/localnet_owner.key";
@@ -65,7 +65,7 @@ fn test_all_pool_quotes(pool_dir: String, pool_type: PoolType) {
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
     println!("owner: {}", owner.pubkey());
 
-    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::confirmed());
+    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::recent());
     let program = provider.program(*ARB_PROGRAM_ID);
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
 
@@ -191,14 +191,13 @@ fn test_pool_quote(
         }
     }
 
-    let (swap_state_pda, _) = Pubkey::find_program_address(&[b"swap_state"], &program.id());
+    let swap_state_pda = Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap();
 
     // initialize swap
     let ix = program
         .request()
         .accounts(tmp_accounts::TokenAndSwapState {
             swap_state: swap_state_pda,
-            src: src_ata,
         })
         .args(tmp_ix::StartSwap {
             swap_input: amount_in as u64,

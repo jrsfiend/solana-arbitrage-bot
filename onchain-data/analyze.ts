@@ -50,7 +50,7 @@ let ORCA_SWAP_PROGRAM_ID = "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP";
 let TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 
 async function search_signer(signer) {
-    // let connection = new web3.Connection("https://api.mainnet-beta.solana.com")
+    // let connection = new web3.Connection("https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9")
 
     let connection = new web3.Connection("https://ssc-dao.genesysgo.net/")
     console.log("searching pubkey: ", signer.toString())

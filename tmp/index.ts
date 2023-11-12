@@ -19,7 +19,7 @@ async function main() {
     // let wallet = web3.Keypair.fromSecretKey(owner_secret);
     // console.log(wallet.publicKey.toString());
     
-    let url = 'https://api.mainnet-beta.solana.com'
+    let url = 'https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9'
     let connection = new web3.Connection(url);
 
     var rawdata = fs.readFileSync(`../../mainnet.key`, 'utf8');  

@@ -35,9 +35,9 @@ fn main() {
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
 
     // ** setup RPC connection
-    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
+    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
 
-    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::confirmed());
+    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::recent());
     let program = provider.program(*ARB_PROGRAM_ID);
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
 

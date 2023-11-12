@@ -61,22 +61,22 @@ fn main() {
 
     let owner_kp_path = match cluster {
         Cluster::Localnet => "../../mainnet_fork/localnet_owner.key",
-        Cluster::Mainnet => "~/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json",
+        Cluster::Mainnet => "/Users/stevengavacs/.config/solana/id.json",
         _ => panic!("shouldnt get here"),
     };
 
     // ** setup RPC connection
     let connection_url = match cluster {
         Cluster::Mainnet => {
-            "https://mainnet.rpc.jito.wtf/?access-token=746bee55-1b6f-4130-8347-5e1ea373333f"
+            "https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9"
         }
         _ => cluster.url(),
     };
     info!("using connection: {}", connection_url);
 
-    let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::confirmed());
+    let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::recent());
     let send_tx_connection =
-        RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
+        RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
 
     // setup anchor things
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
@@ -84,7 +84,7 @@ fn main() {
     let provider = Client::new_with_options(
         cluster.clone(),
         rc_owner.clone(),
-        CommitmentConfig::confirmed(),
+        CommitmentConfig::recent(),
     );
     let program = provider.program(*ARB_PROGRAM_ID);
 
@@ -219,13 +219,13 @@ fn main() {
     let mut pool_count = 0;
     let mut account_ptr = 0;
 
-    for pool in pools.into_iter() {
+    for mut pool in pools.into_iter() {
         // update pool
         let length = update_pks_lengths[pool_count];
         let _account_slice = &update_accounts[account_ptr..account_ptr + length].to_vec();
         account_ptr += length;
 
-        // pool.set_update_accounts(*account_slice);
+        pool.set_update_accounts(_account_slice.to_vec(), cluster.clone());
 
         // add pool to graph
         let idxs = &all_mint_idxs[pool_count * 2..(pool_count + 1) * 2].to_vec();
@@ -250,8 +250,9 @@ fn main() {
     };
 
     info!("searching for arbitrages...");
-    let min_swap_amount = 10_u128.pow(6_u32); // scaled! -- 1 USDC
+    let min_swap_amount = 10_u128.pow(4_u32); // scaled! -- 1 USDC
     let mut swap_start_amount = init_token_balance; // scaled!
+    println!("swap start amount = {}", swap_start_amount);
     let mut sent_arbs = HashSet::new(); // track what arbs we did with a larger size
 
     for _ in 0..4 {

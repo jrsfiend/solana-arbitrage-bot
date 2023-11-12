@@ -188,7 +188,7 @@ async function serumSetup(accounts: any[], programs: any[], mints: any[], connec
 async function main() {
     console.log("establish connection")
     // let connection = new web3.Connection("https://ssc-dao.genesysgo.net");
-    let connection = new web3.Connection("https://api.mainnet-beta.solana.com")
+    let connection = new web3.Connection("https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9")
     let programs = [];
     let accounts = [];
     let mints = [];

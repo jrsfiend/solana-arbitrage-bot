@@ -4,7 +4,7 @@ use anchor_client::solana_sdk::pubkey::Pubkey;
 use anchor_client::solana_sdk::signature::read_keypair_file;
 use anchor_client::solana_sdk::signature::{Keypair, Signer};
 use anchor_client::{Client, Cluster};
-
+use std::str::FromStr;
 use client::pools::SerumPool;
 
 use solana_sdk::transaction::Transaction;
@@ -153,7 +153,7 @@ fn ask_iteration(iteration: &mut Iteration, fee_tier: &FeeTier, ob: &mut OrderBo
 
 fn main() {
     let cluster = Cluster::Localnet;
-    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
+    let connection = RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
 
     // let pool_path = "../../serum/serum_pools/ByRys5tuUWDgL73G8JBAEfkdFf8JWBzPBDHsBVQ5vbQA_serum_dex.json";
     // let pool_path = "../../serum/serum_pools/8PMHyKJ5FycCopijj6eXeCkenB71CYxCKH7AibkksdG5_serum_dex.json";
@@ -294,7 +294,7 @@ fn main() {
     );
 
     // setup anchor things
-    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::confirmed());
+    let provider = Client::new_with_options(cluster, Rc::new(owner), CommitmentConfig::recent());
     let program = provider.program(*ARB_PROGRAM_ID);
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
 
@@ -329,14 +329,13 @@ fn main() {
         tmp::Side::Ask
     };
 
-    let (swap_state, _) = Pubkey::find_program_address(&[b"swap_state"], &program.id());
+    let swap_state = ((Pubkey::from_str("8cjtn4GEw6eVhZ9r1YatfiU65aDEBf1Fof5sTuuH6yVM").unwrap()));
 
     // initialize swap
     let ix = program
         .request()
         .accounts(tmp_accounts::TokenAndSwapState {
             swap_state,
-            src: base_ata,
         })
         .args(tmp_instructions::StartSwap {
             swap_input: amount_in_u,
@@ -483,7 +482,7 @@ fn main() {
     // let cluster = Cluster::Localnet; // !!! make sure its localnet lmfao
     // let connection = RpcClient::new_with_commitment(
     //     cluster.url(),
-    //     CommitmentConfig::confirmed()
+    //     CommitmentConfig::recent()
     // );
 
     // let pool_paths = read_json_dir(&pool_dir);
@@ -598,7 +597,7 @@ fn main() {
     // let provider = Client::new_with_options(
     //     cluster.clone(),
     //     Rc::new(owner),
-    //     CommitmentConfig::confirmed()
+    //     CommitmentConfig::recent()
     // );
     // let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
     // let program = provider.program(str2pubkey(ARB_PROGRAM_ID));
@@ -713,7 +712,7 @@ fn main() {
     // let connection_url = "http://127.0.0.1:8899/";
     // let connection = RpcClient::new_with_commitment(
     //     connection_url,
-    //     CommitmentConfig::confirmed()
+    //     CommitmentConfig::recent()
     // );
 
     // let token_accounts: Vec<Pubkey> = pool.token_accounts

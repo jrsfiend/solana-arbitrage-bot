@@ -11,7 +11,7 @@ lazy_static! {
     pub static ref MERCURIAL_PROGRAM_ID: Pubkey =
         Pubkey::from_str("MERLuDFBMmsHnsBPZw2sDQZHvXFMwp8EdjudcU2HKky").unwrap();
     pub static ref ARB_PROGRAM_ID: Pubkey =
-        Pubkey::from_str("BgJ7a9UKRN5VUKXAgM6q3YiEugGvwqU8eoG1U3Qumvse").unwrap();
+        Pubkey::from_str("CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T").unwrap();
     pub static ref SABER_PROGRAM_ID: Pubkey =
         Pubkey::from_str("SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ").unwrap();
     pub static ref ALDRIN_V1_PROGRAM_ID: Pubkey =

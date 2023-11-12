@@ -39,10 +39,10 @@ fn main() {
     // ** setup RPC connection
     let connection = RpcClient::new_with_commitment(
         "https://ssc-dao.genesysgo.net/",
-        CommitmentConfig::confirmed(),
+        CommitmentConfig::recent(),
     );
     let send_tx_connection =
-        RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
+        RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::recent());
 
     // ** define pool JSONs
     let orca_dir = PoolDir {

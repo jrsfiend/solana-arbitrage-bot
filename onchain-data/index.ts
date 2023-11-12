@@ -58,7 +58,7 @@ var mintToToken = function(arr, mint) {
 
 // analyze a specific swap (what auth got the arbitrage? who else competed for it)
 async function main() {
-    let connection = new web3.Connection("https://api.mainnet-beta.solana.com")
+    let connection = new web3.Connection("https://rpc.shyft.to?api_key=jdXnGbRsn0Jvt5t9")
 
     let swap_block_idx = 124208114; //og = 123658615;
     let swap_signature = "3jyDtos8win2PfeTsjcCi78xVPxRgu1u5eqNCQpQoy72sG6qrWpXxKKKo531JvNyVukh7S43QLMXWcw1miystpzb";
